@@ -1,0 +1,100 @@
+import 'package:amap_search_fluttify/amap_search_fluttify.dart';
+import 'package:flutter/material.dart';
+
+/// 公交路线规划
+class RouteBusScreen extends StatefulWidget {
+  @override
+  _RouteBusScreenState createState() => _RouteBusScreenState();
+}
+
+class _RouteBusScreenState extends State<RouteBusScreen>
+    with AmapSearchDisposeMixin {
+  final _fromLatController = TextEditingController(text: '30.219933');
+  final _fromLngController = TextEditingController(text: '120.023728');
+
+  final _toLatController = TextEditingController(text: '30.27065');
+  final _toLngController = TextEditingController(text: '120.163117');
+
+  String _routeResult = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(title: Text('公交路线规划')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text('起点:'),
+                SizedBox(width: 8.0),
+                Flexible(
+                  child: TextFormField(
+                    controller: _fromLatController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(hintText: '输入出发点纬度'),
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                Flexible(
+                  child: TextFormField(
+                    controller: _fromLngController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(hintText: '输入出发点经度'),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text('终点:'),
+                SizedBox(width: 8.0),
+                Flexible(
+                  child: TextFormField(
+                    controller: _toLatController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(hintText: '输入终点纬度'),
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                Flexible(
+                  child: TextFormField(
+                    controller: _toLngController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(hintText: '输入终点经度'),
+                  ),
+                ),
+              ],
+            ),
+            RaisedButton(
+              onPressed: () async {
+                final routeResult = await AmapSearch.searchBusRoute(
+                  from: LatLng(
+                    double.parse(_fromLatController.text),
+                    double.parse(_fromLngController.text),
+                  ),
+                  to: LatLng(
+                    double.parse(_toLatController.text),
+                    double.parse(_toLngController.text),
+                  ),
+                  city: '杭州',
+                );
+                routeResult
+                    .toFutureString()
+                    .then((it) => setState(() => _routeResult = it));
+              },
+              child: Text('搜索'),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Text(_routeResult),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
